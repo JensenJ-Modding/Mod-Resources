@@ -40,9 +40,9 @@ spotless {
         target '**/src/**/*.java'
         googleJavaFormat()
         trimTrailingWhitespace()
-        indentWithTabs(2)
-        indentWithSpaces(4)
+        //indentWithTabs(2)
+        //indentWithSpaces(4)
         removeUnusedImports()
-        formatAnnotations().addTypeAnnotation("At")
+        //formatAnnotations().addTypeAnnotation("At")
     }
 }
