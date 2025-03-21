@@ -34,15 +34,3 @@ subprojects {
         it.options.release = 17
     }
 }
-
-spotless {
-    java {
-        target '**/src/**/*.java'
-        googleJavaFormat()
-        trimTrailingWhitespace()
-        //indentWithTabs(2)
-        //indentWithSpaces(4)
-        removeUnusedImports()
-        formatAnnotations()
-    }
-}
