@@ -34,3 +34,14 @@ subprojects {
         it.options.release = 17
     }
 }
+
+spotless {
+    java {
+        target '**/src/**/*.java'
+        trimTrailingWhitespace()
+        palantirJavaFormat()
+        importOrder('java', 'javax', 'net.minecraft', 'org.spongepowered|com.llamalad7', '\\#')
+        removeUnusedImports()
+        formatAnnotations()
+    }
+}
