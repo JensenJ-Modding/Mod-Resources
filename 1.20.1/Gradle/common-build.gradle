@@ -18,3 +18,11 @@ dependencies {
     modApi "dev.architectury:architectury:${rootProject.architectury_api_version}"
     modApi "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${forge_config_api_port_version}"
 }
+
+sourceSets.main {
+    resources {
+        srcDir("src/generated/resources")
+        exclude(".cache/**")
+    }
+}
+
