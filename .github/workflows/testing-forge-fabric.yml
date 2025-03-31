@@ -3,16 +3,16 @@ name: Testing
 on:
   workflow_call:
     inputs:
-        gradle_version:
+        gradle-version:
             required: true
             type: string
-        java_version:
+        java-version:
             required: true
             type: number
-        fabric_mods:
+        fabric-mods:
             required: true
             type: string
-        forge_mods:
+        forge-mods:
             required: true
             type: string
 
@@ -28,12 +28,12 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
-          java-version: ${{ inputs.java_version }}
+          java-version: ${{ inputs.java-version }}
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: ${{ inputs.gradle_version }}
+          gradle-version: ${{ inputs.gradle-version }}
           cache-read-only: false
 
       - name: Spotless Check
@@ -50,12 +50,12 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
-          java-version: ${{ inputs.java_version }}
+          java-version: ${{ inputs.java-version }}
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: ${{ inputs.gradle_version }}
+          gradle-version: ${{ inputs.gradle-version }}
           cache-read-only: false
 
       - name: Build
@@ -110,7 +110,7 @@ jobs:
         if: matrix.loader == 'forge'
         run: |
           mkdir -p run/mods
-          echo "${{ inputs.forge_mods }}" | tr ' ' '\n' | while read -r line; do
+          echo "${{ inputs.forge-mods }}" | tr ' ' '\n' | while read -r line; do
             wget "$line" -O run/mods/$(basename "$line")
           done
 
@@ -118,7 +118,7 @@ jobs:
         if: matrix.loader == 'fabric'
         run: |
           mkdir -p run/mods
-          echo "${{ inputs.fabric_mods }}" | tr ' ' '\n' | while read -r line; do
+          echo "${{ inputs.fabric-mods }}" | tr ' ' '\n' | while read -r line; do
             wget "$line" -O run/mods/$(basename "$line")
           done
 
