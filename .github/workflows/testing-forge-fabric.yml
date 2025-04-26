@@ -124,7 +124,7 @@ jobs:
 
       # Lock to a specific commit, incase of breaking changes
       - name: Test Client
-        uses: 3arthqu4ke/mc-runtime-test@3.0.0
+        uses: 3arthqu4ke/mc-runtime-test@3.1.0
         with:
           mc: ${{ env.MINECRAFT_VERSION }}
           modloader: ${{ matrix.loader }}
