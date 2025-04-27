@@ -147,3 +147,12 @@ jobs:
           mc-runtime-test: ${{ matrix.loader == 'forge' && 'lexforge' || 'fabric' }}
           java: ${{ inputs.java-version }}
           fabric-api: ${{ matrix.loader == 'fabric' && env.FABRIC_API_VERSION || 'none' }}
+      
+      - name: Upload Client Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Client Logs and Reports - ${{ matrix.loader }}
+          path: |
+            run/logs/
+            run/crash-reports/
