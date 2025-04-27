@@ -10,14 +10,25 @@ on:
             required: true
             type: number
         fabric-mods:
-            required: true
+            required: false
             type: string
+            default: ""
         forge-mods:
-            required: true
+            required: false
             type: string
+            default: ""
+        test-client:
+            required: false
+            type: string
+            default: "true"
+        lint:
+            required: false
+            type: string
+            default: "true"
 
 jobs:
   lint:
+    if: ${{ inputs.lint == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -78,6 +89,7 @@ jobs:
             forge/build/libs/
 
   launch-client:
+    if: ${{ inputs.test-client == 'true' }}
     timeout-minutes: 5
     strategy:
       fail-fast: false
