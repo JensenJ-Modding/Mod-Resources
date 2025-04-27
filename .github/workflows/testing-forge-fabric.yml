@@ -222,7 +222,7 @@ jobs:
         run: |
           wget -O fabric-installer.jar https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.0.3/fabric-installer-1.0.3.jar
           java -jar fabric-installer.jar server -mcversion ${{ env.MINECRAFT_VERSION }} -loader ${{ env.FABRIC_LOADER_VERSION }} -downloadMinecraft
-          mv fabric-server-launch.jar server.jar
+          mv fabric-server-launch.jar modded-server.jar
           wget -O mods/fabric-api-${{ env.FABRIC_API_VERSION }}+${{ env.MINECRAFT_VERSION }}.jar https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/${{ env.FABRIC_API_VERSION }}+${{ env.MINECRAFT_VERSION }}/fabric-api-${{ env.FABRIC_API_VERSION }}+${{ env.MINECRAFT_VERSION }}.jar
       
       - name: Accept EULA
@@ -230,7 +230,7 @@ jobs:
   
       - name: Test Server
         run: |
-          java -jar server.jar nogui
+          java -jar modded-server.jar nogui
           exit_code=$?
 
           if find crash-reports/ -name '*.txt' | grep -q .; then
