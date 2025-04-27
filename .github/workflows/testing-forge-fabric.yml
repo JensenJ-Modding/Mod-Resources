@@ -189,7 +189,7 @@ jobs:
       - name: Move artifact to mods
         run: |
           mkdir -p mods
-          cp ${{ matrix.loader }}/build/libs/${{env.ARCHIVES_NAME}}-${{ matrix.loader }}-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}.jar run/mods
+          cp ${{ matrix.loader }}/build/libs/${{env.ARCHIVES_NAME}}-${{ matrix.loader }}-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}.jar mods
 
       - name: Download forge dependencies
         if: matrix.loader == 'forge'
@@ -226,7 +226,7 @@ jobs:
       - name: Check EULA acceptance
         run: echo "eula=true" > eula.txt
   
-      - name: Run Fabric Server
+      - name: Test Fabric Server
         if: matrix.loader == 'fabric'
         run: java -jar fabric-server-launch.jar
 
