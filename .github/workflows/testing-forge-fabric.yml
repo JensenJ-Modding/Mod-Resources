@@ -4,31 +4,31 @@ on:
   workflow_call:
     inputs:
         gradle-version:
-            required: true
-            type: string
+          required: true
+          type: string
         java-version:
-            required: true
-            type: number
+          required: true
+          type: number
         fabric-mods:
-            required: false
-            type: string
-            default: ""
+          required: false
+          type: string
+          default: ""
         forge-mods:
-            required: false
-            type: string
-            default: ""
+          required: false
+          type: string
+          default: ""
         test-client:
-            required: false
-            type: string
-            default: "true"
+          required: false
+          type: string
+          default: "true"
         test-server:
           required: false
           type: string
           default: "true"
         lint:
-            required: false
-            type: string
-            default: "true"
+          required: false
+          type: string
+          default: "true"
 
 jobs:
   lint:
@@ -155,7 +155,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: Client Logs and Reports - ${{ matrix.loader }}
+          name: Client Logs - ${{ env.ARCHIVES_NAME }}-${{ matrix.loader }}-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}
           path: |
             run/logs/
             run/crash-reports/
@@ -225,7 +225,7 @@ jobs:
       
       - name: Check EULA acceptance
         run: |
-          if [[ "${{ secrets.MC_EULA_ACCEPTED }}" != "true" ]]; then
+          if [[ ${{ secrets.MC_EULA_ACCEPTED }} != "true" ]]; then
             echo "You must set the MC_EULA_ACCEPTED secret to 'true' to accept the Minecraft EULA."
             exit 1
           fi
@@ -235,11 +235,11 @@ jobs:
         if: matrix.loader == 'fabric'
         run: java -jar fabric-server-launch.jar
 
-      - name: Upload Client Logs
+      - name: Upload Server Logs
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: Client Logs and Reports - ${{ matrix.loader }}
+          name: Server Logs - ${{ env.ARCHIVES_NAME }}-${{ matrix.loader }}-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}}
           path: |
             run/logs/
             run/crash-reports/
