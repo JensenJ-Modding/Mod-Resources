@@ -109,18 +109,20 @@ jobs:
       - name: Download forge dependencies
         if: matrix.loader == 'forge'
         run: |
-          mkdir -p run/mods
-          echo "${{ inputs.forge-mods }}" | tr ' ' '\n' | while read -r line; do
-            wget "$line" -O run/mods/$(basename "$line")
-          done
+          if [ -n "${{ inputs.forge-mods }}" ]; then
+            echo "${{ inputs.forge-mods }}" | tr ' ' '\n' | while read -r line; do
+              wget "$line" -O run/mods/$(basename "$line")
+            done
+          fi
 
       - name: Download fabric dependencies
         if: matrix.loader == 'fabric'
         run: |
-          mkdir -p run/mods
-          echo "${{ inputs.fabric-mods }}" | tr ' ' '\n' | while read -r line; do
-            wget "$line" -O run/mods/$(basename "$line")
-          done
+          if [ -n "${{ inputs.fabric-mods }}" ]; then
+            echo "${{ inputs.fabric-mods }}" | tr ' ' '\n' | while read -r line; do
+              wget "$line" -O run/mods/$(basename "$line")
+            done
+          fi
 
       # Lock to a specific commit, incase of breaking changes
       - name: Test Client
