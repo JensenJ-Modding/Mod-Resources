@@ -162,7 +162,7 @@ jobs:
 
   launch-server:
     if: ${{ inputs.test-server == 'true'}} && secrets.MC_EULA_ACCEPTED == 'true'
-    timeout-minutes: 10
+    timeout-minutes: 5
     strategy:
       fail-fast: false
       matrix:
@@ -222,14 +222,28 @@ jobs:
         run: |
           wget -O fabric-installer.jar https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.0.3/fabric-installer-1.0.3.jar
           java -jar fabric-installer.jar server -mcversion ${{ env.MINECRAFT_VERSION }} -loader ${{ env.FABRIC_LOADER_VERSION }} -downloadMinecraft
+          mv fabric-server-launch.jar server.jar
           wget -O mods/fabric-api-${{ env.FABRIC_API_VERSION }}+${{ env.MINECRAFT_VERSION }}.jar https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/${{ env.FABRIC_API_VERSION }}+${{ env.MINECRAFT_VERSION }}/fabric-api-${{ env.FABRIC_API_VERSION }}+${{ env.MINECRAFT_VERSION }}.jar
       
       - name: Accept EULA
         run: echo "eula=true" > eula.txt
   
-      - name: Test Fabric Server
-        if: matrix.loader == 'fabric'
-        run: java -jar fabric-server-launch.jar
+      - name: Test Server
+        run: |
+          java -jar server.jar nogui
+          exit_code=$?
+
+          if find crash-reports/ -name '*.txt' | grep -q .; then
+            echo "Detected crash report!"
+            exit 1
+          fi
+
+          if [ $exit_code -ne 0 ]; then
+            echo "Minecraft exited with nonzero code ($exit_code)"
+            exit $exit_code
+          fi
+
+          echo "Minecraft exited cleanly."
 
       - name: Upload Server Logs
         if: failure()
