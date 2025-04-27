@@ -179,6 +179,7 @@ jobs:
           echo "MINECRAFT_VERSION=$(grep '^minecraft_version' gradle.properties | awk -F '=' '{gsub(/ /, "", $2); print $2}')" >> "$GITHUB_ENV"
           echo "FABRIC_LOADER_VERSION=$(grep '^fabric_loader_version' gradle.properties | awk -F '=' '{gsub(/ /, "", $2); print $2}')" >> "$GITHUB_ENV"
           echo "FABRIC_API_VERSION=$(grep '^fabric_api_version' gradle.properties | awk -F '=' '{gsub(/ /, "", $2); print $2}')" >> "$GITHUB_ENV"
+          echo "FORGE_VERSION=$(grep '^forge_version' gradle.properties | awk -F '=' '{gsub(/ /, "", $2); print $2}')" >> "$GITHUB_ENV"
           echo "ARCHIVES_NAME=$(grep '^archives_name' gradle.properties | awk -F '=' '{gsub(/ /, "", $2); print $2}')" >> "$GITHUB_ENV"
 
       - name: Download artifacts
@@ -217,6 +218,12 @@ jobs:
           fileName: mcservertest-${{ matrix.loader }}-${{ env.MINECRAFT_VERSION }}-0.1.1+7.jar
           out-file-path: ./mods
 
+      - name: Download & Install Forge
+        if: matrix.loader == 'forge'
+        run: |
+          wget -O forge-installer.jar https://maven.minecraftforge.net/net/minecraftforge/forge/${{ env.MINECRAFT_VERSION }}-${{ env.FORGE_VERSION }}/forge-${{ env.MINECRAFT_VERSION }}-${{ env.FORGE_VERSION }}-installer.jar
+          java -jar forge-installer.jar --installServer
+
       - name: Download & Install Fabric
         if: matrix.loader == 'fabric'
         run: |
@@ -228,7 +235,26 @@ jobs:
       - name: Accept EULA
         run: echo "eula=true" > eula.txt
   
-      - name: Test Server
+      - name: Test Forge Server
+        if: matrix.loader == 'forge'
+        run: |
+          bash run.sh
+          exit_code=$?
+
+          if find crash-reports/ -name '*.txt' | grep -q .; then
+            echo "Detected crash report!"
+            exit 1
+          fi
+
+          if [ $exit_code -ne 0 ]; then
+            echo "Minecraft exited with nonzero code ($exit_code)"
+            exit $exit_code
+          fi
+
+          echo "Minecraft exited cleanly."
+
+      - name: Test Fabric Server
+        if: matrix.loader == 'fabric'
         run: |
           java -jar modded-server.jar nogui
           exit_code=$?
@@ -249,7 +275,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: Server Logs - ${{ env.ARCHIVES_NAME }}-${{ matrix.loader }}-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}}
+          name: Server Logs - ${{ env.ARCHIVES_NAME }}-${{ matrix.loader }}-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}
           path: |
             logs/
             crash-reports/
