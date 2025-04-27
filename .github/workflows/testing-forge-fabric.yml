@@ -213,8 +213,8 @@ jobs:
         uses: robinraju/release-downloader@v1.9
         with:
           repository: JensenJ-Modding/MC-Server-Test
-          tag: 0.1
-          fileName: mcservertest-${{ matrix.loader }}-${{ env.MINECRAFT_VERSION }}-0.1.0.jar
+          tag: 0.1.1
+          fileName: mcservertest-${{ matrix.loader }}-${{ env.MINECRAFT_VERSION }}-0.1.1+7.jar
           out-file-path: ./mods
 
       - name: Download & Install Fabric
