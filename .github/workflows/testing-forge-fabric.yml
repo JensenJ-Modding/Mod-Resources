@@ -51,6 +51,9 @@ jobs:
           gradle-version: ${{ inputs.gradle-version }}
           cache-read-only: false
 
+      - name: Clear Gradle Cache Lock
+        run: find ~/.gradle/ -name "*.lock" | xargs rm
+
       - name: Spotless Check
         run: gradle spotlessCheck
 
@@ -72,6 +75,9 @@ jobs:
         with:
           gradle-version: ${{ inputs.gradle-version }}
           cache-read-only: false
+
+      - name: Clear Gradle Cache Lock
+        run: find ~/.gradle/ -name "*.lock" | xargs rm
 
       - name: Build
         run: gradle build -x spotlessJava -x spotlessJavaCheck -x spotlessCheck -PbuildNumber=${{ github.run_number }}
