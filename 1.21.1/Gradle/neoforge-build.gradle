@@ -23,11 +23,11 @@ sourceSets {
 }
 
 loom {
-    forge {
+    neoforge {
         mixinConfig "${archives_name}-common.mixins.json"
-        mixinConfig "${archives_name}-forge.mixins.json"
+        mixinConfig "${archives_name}-neoforge.mixins.json"
     }
-    mixin.defaultRefmapName.set("${archives_name}-forge-refmap.json")
+    mixin.defaultRefmapName.set("${archives_name}-neoforge-refmap.json")
 	
 	runs {
         data {
