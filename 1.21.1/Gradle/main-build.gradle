@@ -1,0 +1,47 @@
+def buildNumber = project.hasProperty('buildNumber') ? project.buildNumber : 'local'
+
+architectury {
+    minecraft = project.minecraft_version
+}
+
+allprojects {
+    group = rootProject.maven_group
+    version = minecraft_version + "-" + mod_version + "+" + buildNumber
+}
+
+subprojects {
+    apply plugin: 'dev.architectury.loom'
+    apply plugin: 'architectury-plugin'
+    apply plugin: 'maven-publish'
+
+    loom {
+        silentMojangMappingsLicense()
+    }
+
+    dependencies {
+        minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
+        mappings loom.officialMojangMappings()
+    }
+
+    java {
+        withSourcesJar()
+
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        it.options.release = 21
+    }
+}
+
+spotless {
+    java {
+        target '**/src/**/*.java'
+        trimTrailingWhitespace()
+        palantirJavaFormat()
+        importOrder('java', 'javax', 'net.minecraft', 'org.spongepowered|com.llamalad7', '\\#')
+        removeUnusedImports()
+        formatAnnotations()
+    }
+}
