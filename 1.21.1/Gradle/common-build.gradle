@@ -16,7 +16,7 @@ loom {
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     modApi "dev.architectury:architectury:${rootProject.architectury_api_version}"
-    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-common-neoforge:${forge_config_api_port_version}"
+    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-common-neoforgeapi:${forge_config_api_port_version}"
 }
 
 sourceSets.main {
