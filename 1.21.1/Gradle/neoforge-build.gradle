@@ -23,9 +23,8 @@ sourceSets {
 }
 
 loom {
-    neoforge {
-        mixinConfig "${archives_name}-common.mixins.json"
-        mixinConfig "${archives_name}-neoforge.mixins.json"
+	mixin {
+        useLegacyMixinAp = true
     }
     mixin.defaultRefmapName.set("${archives_name}-neoforge-refmap.json")
 	
