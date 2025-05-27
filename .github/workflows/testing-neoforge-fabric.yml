@@ -96,7 +96,7 @@ jobs:
           path: |
             common/build/libs/
             fabric/build/libs/
-            forge/build/libs/
+            neoforge/build/libs/
 
   launch-client:
     if: ${{ inputs.test-client == 'true' }}
@@ -193,7 +193,7 @@ jobs:
 
       - name: Move artifact to mods
         run: |
-          mkdir -p mods
+          mkdir -p run/mods
           cp ${{ matrix.loader }}/build/libs/${{env.ARCHIVES_NAME}}-${{ matrix.loader }}-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}.jar run/mods
 
       - name: Download neoforge dependencies
