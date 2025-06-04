@@ -92,7 +92,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Artifacts - ${{ env.ARCHIVES_NAME }}-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}
-          retention-days: 1
+          retention-days: 14
           path: |
             common/build/libs/
             fabric/build/libs/
