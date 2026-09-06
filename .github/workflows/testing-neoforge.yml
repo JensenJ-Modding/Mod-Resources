@@ -1,0 +1,165 @@
+name: Testing
+
+on:
+  workflow_call:
+    inputs:
+        gradle-version:
+          required: true
+          type: string
+        java-version:
+          required: true
+          type: number
+        neoforge-mods:
+          required: false
+          type: string
+          default: ""
+        test-client:
+          required: false
+          type: string
+          default: "true"
+        test-server:
+          required: false
+          type: string
+          default: "true"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: ${{ inputs.java-version }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: ${{ inputs.gradle-version }}
+          cache-read-only: false
+
+      - name: Clear Gradle Cache Lock
+        run: find ~/.gradle/ -name "*.lock" | xargs rm
+
+      - name: Build
+        run: gradle build -PbuildNumber=${{ github.run_number }}
+
+      - name: Setup environment variables
+        run: |
+          echo "MOD_VERSION=$(grep '^mod_version' gradle.properties | awk -F '=' '{gsub(/ /, "", $2); print $2}')" >> "$GITHUB_ENV"
+          echo "MINECRAFT_VERSION=$(grep '^minecraft_version' gradle.properties | awk -F '=' '{gsub(/ /, "", $2); print $2}')" >> "$GITHUB_ENV"
+          echo "MOD_ID=$(grep '^mod_id' gradle.properties | awk -F '=' '{gsub(/ /, "", $2); print $2}')" >> "$GITHUB_ENV"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Artifacts - ${{ env.MOD_ID }}-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}
+          retention-days: 14
+          path: |
+            build/libs/
+
+  launch-client:
+    if: ${{ inputs.test-client == 'true' }}
+    timeout-minutes: 5
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup environment variables
+        run: |
+          echo "MOD_VERSION=$(grep '^mod_version' gradle.properties | awk -F '=' '{gsub(/ /, "", $2); print $2}')" >> "$GITHUB_ENV"
+          echo "MINECRAFT_VERSION=$(grep '^minecraft_version' gradle.properties | awk -F '=' '{gsub(/ /, "", $2); print $2}')" >> "$GITHUB_ENV"
+          echo "MOD_ID=$(grep '^mod_id' gradle.properties | awk -F '=' '{gsub(/ /, "", $2); print $2}')" >> "$GITHUB_ENV"
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: Artifacts - ${{ env.MOD_ID }}-neoforge-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}
+
+      - name: Move artifact to run/mods
+        run: |
+          mkdir -p run/mods
+          cp build/libs/${{ env.MOD_ID }}-neoforge-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}.jar run/mods
+
+      - name: Download NeoForge dependencies
+        run: |
+          if [ -n "${{ inputs.neoforge-mods }}" ]; then
+            echo "${{ inputs.neoforge-mods }}" | tr ' ' '\n' | while read -r line; do
+              wget "$line" -O run/mods/$(basename "$line")
+            done
+          fi
+
+      - name: Test Client
+        uses: 3arthqu4ke/mc-runtime-test@4.5.1
+        with:
+          mc: ${{ env.MINECRAFT_VERSION }}
+          modloader: neoforge
+          regex: .*neoforge.*
+          mc-runtime-test: neoforge
+          java: ${{ inputs.java-version }}
+          fabric-api: 'none'
+      
+      - name: Upload Client Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Client Logs - ${{ env.ARCHIVES_NAME }}-neoforge-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}
+          path: |
+            run/logs/
+            run/crash-reports/
+
+  launch-server:
+    if: ${{ inputs.test-server == 'true'}}
+    timeout-minutes: 5
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup environment variables
+        run: |
+          echo "MOD_VERSION=$(grep '^mod_version' gradle.properties | awk -F '=' '{gsub(/ /, "", $2); print $2}')" >> "$GITHUB_ENV"
+          echo "MINECRAFT_VERSION=$(grep '^minecraft_version' gradle.properties | awk -F '=' '{gsub(/ /, "", $2); print $2}')" >> "$GITHUB_ENV"
+          echo "MOD_ID=$(grep '^mod_id' gradle.properties | awk -F '=' '{gsub(/ /, "", $2); print $2}')" >> "$GITHUB_ENV"
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: Artifacts - ${{ env.MOD_ID }}-neoforge-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}
+
+      - name: Move artifact to mods
+        run: |
+          mkdir -p run/mods
+          cp build/libs/${{ env.MOD_ID }}-neoforge-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}.jar run/mods
+
+      - name: Download neoforge dependencies
+        run: |
+          if [ -n "${{ inputs.neoforge-mods }}" ]; then
+            echo "${{ inputs.neoforge-mods }}" | tr ' ' '\n' | while read -r line; do
+              wget "$line" -O run/mods/$(basename "$line")
+            done
+          fi
+          
+      - name: Run MC test server
+        uses: headlesshq/mc-server-test@1.1.1
+        with:
+          mc: ${{ env.MINECRAFT_VERSION }}
+          modloader: neoforge
+          java: ${{ inputs.java-version }}
+          fabric-api: 'none'
+
+      - name: Upload Server Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Server Logs - ${{ env.ARCHIVES_NAME }}-neoforge-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}
+          path: |
+            logs/
+            crash-reports/
