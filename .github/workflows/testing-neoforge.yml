@@ -85,7 +85,7 @@ jobs:
       - name: Move artifact to run/mods
         run: |
           mkdir -p run/mods
-          cp build/libs/${{ env.MOD_ID }}-neoforge-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}.jar run/mods
+          cp ${{ env.MOD_ID }}-neoforge-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}.jar run/mods
 
       - name: Download NeoForge dependencies
         run: |
@@ -137,7 +137,7 @@ jobs:
       - name: Move artifact to mods
         run: |
           mkdir -p run/mods
-          cp build/libs/${{ env.MOD_ID }}-neoforge-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}.jar run/mods
+          cp ${{ env.MOD_ID }}-neoforge-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}.jar run/mods
 
       - name: Download neoforge dependencies
         run: |
