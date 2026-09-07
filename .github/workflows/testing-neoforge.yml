@@ -57,7 +57,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Artifacts - ${{ env.MOD_ID }}-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}
+          name: Artifacts - ${{ env.MOD_ID }}-neoforge-${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}+${{ github.run_number }}
           retention-days: 14
           path: |
             build/libs/
